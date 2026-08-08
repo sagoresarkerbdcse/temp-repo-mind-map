@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SPM — Mind Maps, Set by Set</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFF1EC;
+    --sheet:#FBFCFA;
+    --ink:#16202E;
+    --ink-2:#4A5666;
+    --ink-3:#7E8896;
+    --rule:#D3D8CE;
+    --rule-2:#E4E8DF;
+    --c1:#17607D;
+    --c2:#B3541E;
+    --c3:#4A6E2F;
+    --c4:#6B4E9E;
+    --c5:#A32D34;
+    --hl:#F2D64B;
+    --mono:'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    --sans:'Archivo', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:var(--sans); font-size:15px; line-height:1.5;
+    background-image:linear-gradient(var(--rule-2) 1px, transparent 1px);
+    background-size:100% 34px;
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead{
+    border-bottom:2px solid var(--ink);
+    background:var(--paper);
+    padding:26px 20px 16px;
+  }
+  .masthead .wrap{max-width:1120px;margin:0 auto}
+  .eyebrow{
+    font-family:var(--mono); font-size:11px; letter-spacing:.18em;
+    text-transform:uppercase; color:var(--ink-3); margin:0 0 6px;
+  }
+  h1{
+    font-size:clamp(28px,6vw,46px); font-weight:800; letter-spacing:-.03em;
+    margin:0 0 8px; line-height:1;
+  }
+  .sub{font-size:14px;color:var(--ink-2);margin:0;max-width:60ch}
+
+  /* ---------- controls ---------- */
+  .controls{
+    position:sticky; top:0; z-index:20;
+    background:rgba(239,241,236,.94);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--rule);
+    padding:10px 20px;
+  }
+  .controls .wrap{
+    max-width:1120px;margin:0 auto;
+    display:flex;gap:8px;flex-wrap:wrap;align-items:center;
+  }
+  .chip{
+    font-family:var(--mono); font-size:11.5px; letter-spacing:.04em;
+    padding:5px 10px; border:1px solid var(--rule); border-radius:2px;
+    background:var(--sheet); color:var(--ink-2); cursor:pointer;
+    transition:.12s ease;
+  }
+  .chip:hover{border-color:var(--ink-3);color:var(--ink)}
+  .chip[aria-pressed="true"]{background:var(--ink);color:var(--sheet);border-color:var(--ink)}
+  .chip:focus-visible{outline:2px solid var(--c1);outline-offset:2px}
+  .spacer{flex:1}
+  .count{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+
+  /* ---------- sheet ---------- */
+  main{max-width:1120px;margin:0 auto;padding:24px 20px 80px}
+  .sheet{
+    background:var(--sheet);
+    border:1px solid var(--rule);
+    border-left:4px solid var(--accent);
+    margin:0 0 22px;
+    box-shadow:0 1px 0 rgba(22,32,46,.05);
+  }
+  .titleblock{
+    display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;
+    padding:14px 18px; border-bottom:1px solid var(--rule);
+    background:linear-gradient(to bottom, rgba(22,32,46,.025), transparent);
+  }
+  .code{
+    font-family:var(--mono); font-size:12px; font-weight:600;
+    color:var(--accent); letter-spacing:.06em;
+    border:1px solid var(--accent); border-radius:2px; padding:2px 7px;
+  }
+  .setname{font-weight:600;font-size:17px;letter-spacing:-.01em;margin:0}
+  .marks{
+    font-family:var(--mono);font-size:11px;color:var(--ink-3);
+    margin-left:auto;white-space:nowrap;
+  }
+  .scenario{
+    padding:10px 18px; border-bottom:1px solid var(--rule-2);
+    font-size:13.5px; color:var(--ink-2); font-style:italic;
+  }
+  .body{padding:8px 18px 18px}
+
+  /* ---------- tree ---------- */
+  .branch{margin:16px 0 0}
+  .branch:first-child{margin-top:12px}
+  .bhead{
+    display:flex;gap:9px;align-items:baseline;
+    font-weight:600;font-size:14.5px;letter-spacing:-.005em;
+    padding-bottom:3px;
+  }
+  .bhead .q{
+    font-family:var(--mono);font-size:11px;font-weight:600;
+    color:#fff;background:var(--accent);
+    padding:2px 6px;border-radius:2px;white-space:nowrap;
+    position:relative;top:-1px;
+  }
+  ul.tree{list-style:none;margin:4px 0 0;padding:0 0 0 12px}
+  ul.tree ul{list-style:none;margin:3px 0 5px;padding:0 0 0 16px}
+  ul.tree li{
+    position:relative;padding:2px 0 2px 16px;
+    font-size:13.8px;color:var(--ink);
+  }
+  ul.tree li::before{
+    content:"";position:absolute;left:0;top:0;
+    width:1px;height:100%;background:var(--rule);
+  }
+  ul.tree li:last-child::before{height:12px}
+  ul.tree li::after{
+    content:"";position:absolute;left:0;top:12px;
+    width:10px;height:1px;background:var(--rule);
+  }
+  ul.tree > li > .node{font-weight:500}
+  ul.tree ul li{font-size:13px;color:var(--ink-2)}
+  .key{
+    background:linear-gradient(to bottom, transparent 58%, var(--hl) 58%, var(--hl) 92%, transparent 92%);
+    font-weight:600;color:var(--ink);
+  }
+  .mono{font-family:var(--mono);font-size:12.5px;color:var(--ink)}
+  .calc{
+    font-family:var(--mono);font-size:12px;line-height:1.7;
+    background:rgba(22,32,46,.04);border-left:2px solid var(--accent);
+    padding:8px 10px;margin:6px 0 4px;white-space:pre-wrap;color:var(--ink);
+    overflow-x:auto;
+  }
+  .trap{
+    display:block;margin:6px 0 2px;padding:7px 10px;
+    border:1px dashed var(--c5);border-radius:2px;
+    font-size:12.5px;color:var(--c5);background:rgba(163,45,52,.04);
+  }
+  .trap b{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+
+  .legend{
+    max-width:1120px;margin:0 auto;padding:0 20px 30px;
+    font-size:12.5px;color:var(--ink-2);
+  }
+  .legend span{font-family:var(--mono);font-size:11px}
+
+  @media (max-width:640px){
+    .body{padding:6px 12px 14px}
+    .titleblock,.scenario{padding-left:12px;padding-right:12px}
+    ul.tree{padding-left:4px}
+    ul.tree ul{padding-left:12px}
+    .marks{margin-left:0;width:100%}
+  }
+  @media print{
+    body{background:#fff;background-image:none}
+    .controls{display:none}
+    .sheet{break-inside:avoid;box-shadow:none}
+    .masthead{border-bottom-width:1px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <p class="eyebrow">Software Project Management · Revision sheet</p>
+    <h1>Mind maps, set by set</h1>
+    <p class="sub">Sixteen question sets, each decomposed the way a WBS is — question at the root, answer branches below it. Yellow marks the phrase that carries the mark. Red boxes are the traps.</p>
+  </div>
+</header>
+
+<nav class="controls">
+  <div class="wrap" id="chips">
+    <button class="chip" data-area="all" aria-pressed="true">All 16</button>
+    <button class="chip" data-area="1" aria-pressed="false">1 · Scope</button>
+    <button class="chip" data-area="2" aria-pressed="false">2 · Proposal</button>
+    <button class="chip" data-area="3" aria-pressed="false">3 · Schedule</button>
+    <button class="chip" data-area="4" aria-pressed="false">4 · Cost</button>
+    <button class="chip" data-area="5" aria-pressed="false">5 · Comms</button>
+    <button class="chip" data-area="6" aria-pressed="false">6 · Quality</button>
+    <button class="chip" data-area="7" aria-pressed="false">7 · Resource</button>
+    <button class="chip" data-area="8" aria-pressed="false">8 · Risk</button>
+    <span class="spacer"></span>
+    <span class="count" id="count"></span>
+  </div>
+</nav>
+
+<main id="sheets"></main>
+
+<p class="legend"><span>KEY —</span> yellow highlight = the exact term the marker looks for · dashed red = the mistake that loses marks · mono blocks = arithmetic to reproduce in full.</p>
+
+<script>
+const C = ['var(--c1)','var(--c2)','var(--c3)','var(--c4)','var(--c5)'];
+
+const SETS = [
+/* ============ AREA 1 ============ */
+{
+ area:1, code:'1 · SET 1', accent:C[0], marks:'9 + 8 + 8 = 25',
+ name:'Hospital Management System — matrix org, extra features, flat QA team',
+ scenario:'Client demands reporting features absent from signed requirements; senior devs shared with a billing contract; QA doing regression for months with no recognition.',
+ branches:[
+  {q:'Q1 · 9m', head:'WBS, Scope Baseline, Scope Validation — in scope?', tree:[
+    ['<b>WBS</b> — hierarchical decomposition into work packages',
+      ['Plan · estimate · assign · monitor · control','Foundation for scheduling and budgeting']],
+    ['<b>Scope Baseline</b> = <span class="key">Scope Statement + WBS + WBS Dictionary</span>',
+      ['Reference point for measuring performance','Yardstick for judging every change request']],
+    ['<b>Scope Validation</b> — formal client acceptance vs baseline',
+      ['Inspection, walkthrough, demo, sign-off','Reduces disputes over completed work']],
+    ['Verdict: <span class="key">NO — out of scope</span>',
+      ['Not in signed requirements; baseline was approved','<span class="key">100% Rule</span> — not in WBS = outside the project','Delivering informally = textbook scope creep']],
+    ['Resolution path',
+      ['Verify first: requirements, WBS dictionary, RTM, workshop minutes','Neither refuse outright nor silently absorb','Raise <span class="key">Change Request</span> → Integrated Change Control','Impact analysis: cost, schedule, critical path, QA load','Sponsor/CCB options: approve + extend · defer to Phase 2 · swap for low-value work','Update baseline only after written approval','Prevention: incremental scope validation, module by module']]
+  ], trap:'Do not just say “tell the client no.” The marks are in the change-control route, not the refusal.'},
+  {q:'Q2 · 8m', head:'Four forms of power — which one here?', tree:[
+    ['The four powers',
+      ['<b>Formal / Legitimate</b> — authority from the position','<b>Expert</b> — knowledge, skill, technical credibility','<b>Referent</b> — trust, respect, relationships','<b>Reward</b> — bonus, promotion, recognition, good work']],
+    ['Scenario reading',
+      ['<span class="key">Matrix structure</span> — devs shared across two projects','PM has limited authority over shared staff','Functional managers retain control of personnel']],
+    ['Recommendation: <span class="key">Expert power, supported by Referent</span>',
+      ['Expert — argue with schedules, workload analysis, risk data','Referent — build goodwill with functional managers','Formal authority alone fails in a matrix org']]
+  ]},
+  {q:'Q3 · 8m', head:'Motivation theory for the QA team', tree:[
+    ['Theory: <span class="key">Herzberg Two-Factor</span>',
+      ['<b>Hygiene</b> — salary, conditions, policy, security → only prevent dissatisfaction','<b>Motivators</b> — recognition, achievement, responsibility, growth → create satisfaction']],
+    ['Diagnosis',
+      ['Months of repetitive regression testing','No recognition → motivators absent','Result: disengagement, rising absenteeism']],
+    ['Low-cost intervention',
+      ['<span class="key">Job rotation</span> into automation / exploratory testing','Recognition ritual — praise in weekly meeting, QA Contributor of the Month','Let testers present their own improvements','Adds recognition + responsibility + growth at near-zero cost']]
+  ], trap:'Hygiene factors are not the cause here. Say explicitly that the problem is missing motivators, not inadequate hygiene.'}
+ ]
+},
+{
+ area:1, code:'1 · SET 2', accent:C[0], marks:'9 + 8 + 8 = 25',
+ name:'Inventory system — developer secretly builds a barcode feature',
+ scenario:'Stakeholder emails a developer directly; dev builds it in a week without telling the PM; delivery slips 10 days; the feature breaks the DB schema for two other modules.',
+ branches:[
+  {q:'Q1 · 9m', head:'Which scope processes failed', tree:[
+    ['<span class="key">Control Scope — the primary failure</span>',
+      ['Exists to prevent scope creep via formal change control','Feature built with zero approval','Impact: uncontrolled expansion, 10-day slip, defects']],
+    ['<b>Validate Scope — failed</b>',
+      ['No formal review or client acceptance of the deliverable','Unauthorised work entered the product']],
+    ['<b>Define Scope / Baseline — not followed</b>',
+      ['A forgotten requirement was built instead of submitted','Approved baseline was ignored']]
+  ]},
+  {q:'Q2 · 8m', head:'The correct workflow — process + document per step', tree:[
+    ['1. Stakeholder raises requirement → <span class="mono">Change Request Form</span>'],
+    ['2. Developer <span class="key">forwards to PM</span>, does not implement → <span class="mono">Change Request</span>'],
+    ['3. <span class="key">Integrated Change Control</span> → <span class="mono">Impact Analysis Report</span>',
+      ['Scope, schedule, cost, quality, risk, resources']],
+    ['4. CCB / sponsor reviews → <span class="mono">Change Log, CCB Decision</span>'],
+    ['5. Approve or reject → <span class="mono">Approved/Rejected CR</span>'],
+    ['6. If approved, update baselines → <span class="mono">Scope Baseline, WBS, Schedule, Budget</span>'],
+    ['7. Implement → <span class="mono">Updated Project Plan</span>'],
+    ['8. Test, then <span class="key">Validate Scope</span> → <span class="mono">Accepted Deliverables / Sign-off</span>'],
+    ['If rejected — do not build it; continue on the approved baseline']
+  ], trap:'The question asks for the process AND the document at each step. Half the marks are in the document column.'},
+  {q:'Q3 · 8m', head:'Two preventive controls', tree:[
+    ['<b>Control 1 — enforce formal change control</b>',
+      ['No developer implements a stakeholder request directly','Every request documented; PM and CCB assess impact first','Benefit: prevents creep, protects schedule and budget']],
+    ['<b>Control 2 — <span class="key">single communication channel</span> through the PM</b>',
+      ['Stakeholders told where requests go','Maintain <span class="key">RTM</span> and <span class="key">Change Log</span>','Benefit: accountability, no cross-module technical conflicts']]
+  ], trap:'Give exactly two, each with implementation + benefit. A list of six loses structure marks.'}
+ ]
+},
+/* ============ AREA 2 ============ */
+{
+ area:2, code:'2 · SET 1', accent:C[1], marks:'7 + 6 + 6 + 6 = 25',
+ name:'Bangladesh Railway mega-system — scope, sizing, roles, schedule',
+ scenario:'Nationwide signalling, ticketing and train tracking. Several hundred engineers, massive budget, proposal stage.',
+ branches:[
+  {q:'(a) · 7m', head:'Lock the scope baseline; show In vs Out of scope', tree:[
+    ['1. <b>Requirements elicitation</b>',
+      ['Workshops with Railway, station managers, signal engineers','Functional + non-functional','Prioritise with <span class="key">MoSCoW</span>']],
+    ['2. <b>Scope Statement</b>',
+      ['Objectives, deliverables, assumptions, constraints','Acceptance criteria and <span class="key">explicit exclusions</span>']],
+    ['3. <b>WBS + WBS Dictionary</b> to work-package level'],
+    ['4. <b>Formal client sign-off</b> locks the baseline'],
+    ['5. <b>In-Scope / Out-of-Scope table</b> in the proposal',
+      ['Clause: <i>any functionality not listed in the approved Scope Baseline is Out-of-Scope and must follow the Change Control Process</i>']]
+  ]},
+  {q:'(b) · 6m', head:'Function Points over Lines of Code for COCOMO II', tree:[
+    ['<b>Why not LOC</b>',
+      ['Unknowable at proposal time — circular dependency','Language and technology dependent; system is not monolingual','Cannot estimate before design','Rewards verbose code']],
+    ['<b>Why FP</b>',
+      ['Measures <span class="key">functionality delivered to the user</span>','Technology independent','Available early, from requirements','Business-understandable, comparable across projects','Reliable input to COCOMO II']]
+  ]},
+  {q:'(c) · 6m', head:'RACI matrix', tree:[
+    ['<span class="key">R</span>esponsible — does the work'],
+    ['<span class="key">A</span>ccountable — owns it, exactly one per task'],
+    ['<span class="key">C</span>onsulted — two-way input'],
+    ['<span class="key">I</span>nformed — one-way updates'],
+    ['Allocation',
+      ['Software Architect — A on architecture and technology','Lead Developer — R on coding and implementation','QA Manager — A on test planning and quality sign-off, C on architecture']],
+    ['Benefit — removes ownership confusion and duplicated effort']
+  ], trap:'Draw the grid. A prose description without a matrix loses the format marks.'},
+  {q:'(d) · 6m', head:'CPM assurance to the evaluation board', tree:[
+    ['<b>Critical Path</b> — longest dependent sequence',
+      ['Determines minimum project duration','<span class="key">Zero float</span>; any delay delays the project','Monitored continuously']],
+    ['<b>Float / Slack</b> = <span class="mono">LS − ES = LF − EF</span>',
+      ['Positive float on non-critical work absorbs minor delay','Allocated strategically as buffer']],
+    ['<b>Resource Crashing</b>',
+      ['Extra engineers, extra teams, overtime, parallel test teams','Shortens duration but <span class="key">increases cost</span>','Contingency funds reserved for critical-path crashing only']],
+    ['Proposal contains: network diagram, ES/EF/LS/LF, float table, identified critical path, risk buffer']
+  ]}
+ ]
+},
+{
+ area:2, code:'2 · SET 2', accent:C[1], marks:'7 + 6 + 6 + 6 = 25',
+ name:'Frameworks and processes in proposal preparation',
+ scenario:'Procurement documents, proposal structure, technical vs financial split, and bid evaluation for a large engineering software system.',
+ branches:[
+  {q:'(a) · 7m', head:'RFI vs RFP vs RFQ', tree:[
+    ['<b>RFI</b> — gather information',
+      ['Early planning · vendor capability · general response','Railway: survey available technologies and vendors']],
+    ['<b>RFP</b> — request a complete solution',
+      ['Vendor selection · technical + financial merit · detailed proposal','Includes solution, methodology, schedule, team, risk, cost']],
+    ['<b>RFQ</b> — request a price',
+      ['Final purchasing · requirements already fixed · price quotation','Railway: price hardware, licences, specific services']],
+    ['Sequence: <span class="key">RFI → RFP → RFQ</span>']
+  ], trap:'Draw the 5-row comparison table (purpose, stage, focus, response, evaluation). It is the whole answer.'},
+  {q:'(b) · 6m', head:'Proposal structure + why the Risk section matters', tree:[
+    ['<b>Structure</b>',
+      ['Executive Summary · Background · Problem Statement · Objectives','Scope of Work · Technical Solution · Methodology · WBS','Schedule · Resource Plan · Cost Estimate','<span class="key">Risk Management Plan</span> · QA Plan · Deliverables','Assumptions & Constraints · Terms · Conclusion']],
+    ['<b>Risk section in a safety-critical bid</b>',
+      ['Identifies risks, rates probability and impact, defines responses','Signalling failure → <span class="key">loss of life</span>, regulatory penalty, shutdown','Proves domain maturity; builds client confidence']]
+  ]},
+  {q:'(c) · 6m', head:'Technical vs Financial proposal; methodology choice', tree:[
+    ['<b>Technical</b> = <i>how</i>',
+      ['Architecture, methodology, team, schedule, quality, risk']],
+    ['<b>Financial</b> = <i>how much</i>',
+      ['Cost breakdown, payment milestones, taxes','Sealed separately so cost does not bias technical scoring']],
+    ['<b>Justifying the methodology</b>',
+      ['<b>Waterfall</b> — fixed, regulated, safety-critical, heavy documentation','<b>Agile</b> — evolving requirements, frequent client feedback','Large government systems → <span class="key">hybrid</span>: Waterfall governance, Agile delivery']]
+  ]},
+  {q:'(d) · 6m', head:'Bid evaluation + weighted scoring + change control', tree:[
+    ['<b>Criteria</b> — technical approach, experience, team, methodology, timeline, cost, support'],
+    ['<b>Weighted scoring model</b>',
+      ['<span class="mono">Total = Σ (weight × score)</span>','Highest total wins','<span class="key">QCBS</span> — technical ~70–80%, financial ~20–30%']],
+    ['<b>Why change control is declared in the proposal</b>',
+      ['Both parties agree upfront how changes are raised, priced, approved','Prevents scope creep; protects budget and timeline','Ensures traceability; reduces disputes']]
+  ]}
+ ]
+},
+/* ============ AREA 3 ============ */
+{
+ area:3, code:'3 · Q1', accent:C[2], marks:'8 + 8 + 9 = 25',
+ name:'Technova healthcare system — plan, WBS, revised plan',
+ scenario:'8 months, BDT 96 lakh. 1 PM, 1 BA, 6 devs, 3 testers, 1 UI/UX, 1 DevOps. Client adds telemedicine + AI; two devs resign; one hospital wants a pilot at 4 months.',
+ branches:[
+  {q:'(a) · 8m', head:'Project plan + justify the components', tree:[
+    ['Scope Management Plan — deliverables + change control → prevents creep'],
+    ['Schedule Plan — milestones, dependencies, critical path → 8 months + 4-month pilot'],
+    ['Resource Plan — allocate PM, BA, devs, testers, UI/UX, DevOps'],
+    ['Cost Plan — control against BDT 96 lakh'],
+    ['Risk Plan — resignation, requirement change, compression, integration failure'],
+    ['Quality Plan — coding standards, test strategy, reviews, acceptance criteria'],
+    ['Communication Plan — meetings, reporting, stakeholder channels'],
+    ['Deliverables: SRS, prototype, appointment module, EMR, telemedicine, AI recommendation, test reports, deployment + training, documentation']
+  ], trap:'Each component needs an “Importance:” line. Naming them without justification halves the marks.'},
+  {q:'(b) · 8m', head:'WBS and how it supports planning and monitoring', tree:[
+    ['Deliverable-oriented, decomposed to <span class="key">Level 3</span>'],
+    ['Benefits',
+      ['Better planning — manageable work packages','Accurate scheduling — duration and dependency estimation','Resource allocation — assigns responsibility','Cost estimation at work-package level','Progress monitoring — completion tracked per package','Prevents omitted work']]
+  ]},
+  {q:'(c) · 9m', head:'Revise the plan: new features + resignations + earlier pilot', tree:[
+    ['1. Route telemedicine and AI through <span class="key">formal change control</span>'],
+    ['2. <span class="key">MoSCoW</span> — Must-haves in the 4-month pilot',
+      ['Registration, appointment scheduling, EMR core','Defer telemedicine and AI to the full release']],
+    ['3. Reallocate resources — experienced devs on critical modules; contractors if budget allows'],
+    ['4. Schedule compression',
+      ['<b>Fast tracking</b> — UI alongside backend; test finished modules early','<b>Crashing</b> — critical-path activities only']],
+    ['5. Monitor the critical path with CPM'],
+    ['6. Maintain quality — automated regression, no cut testing'],
+    ['7. Continuous stakeholder communication']
+  ]}
+ ]
+},
+{
+ area:3, code:'3 · Q2', accent:C[2], marks:'8 + 9 + 8 = 25',
+ name:'Scholarship Management Portal — the CPM numerical',
+ scenario:'A 2, B 4 (A), C 3 (A), D 5 (B), E 4 (C), F 2 (D,E), G 3 (F). Six weeks in: B slips 2 weeks, C finishes 1 week early, two devs pulled off D, deadline unchanged.',
+ branches:[
+  {q:'(a) · 8m', head:'Effect on the schedule; the bottlenecks', calc:
+`Path 1: A→B→D→F→G = 2+4+5+2+3 = 16 wks  ← CRITICAL PATH
+Path 2: A→C→E→F→G = 2+3+4+2+3 = 14 wks     (float = 2 wks)
+Original duration = 16 weeks
+
+B +2  → 2+6+5+2+3 = 18 wks   project slips 2 weeks
+C −1  → path 2 = 13 wks      NO EFFECT
+D short-staffed → stretches → further critical-path delay`,
+   tree:[
+    ['Critical path = <span class="key">A → B → D → F → G = 16 weeks</span>'],
+    ['Event 1 — B delayed 2 weeks → project becomes <span class="key">18 weeks</span>'],
+    ['Event 2 — C early gains nothing',
+      ['F is a <span class="key">merge point</span>: cannot start until <b>both</b> D and E finish','Slack on the C–E path simply grows']],
+    ['Event 3 — devs removed from D → D stretches, directly on the critical path'],
+    ['Bottlenecks: <span class="key">B, D, F, G</span> — all critical-path activities',
+      ['C and E have float and are not bottlenecks']]
+  ], trap:'The merge-point logic is the examined idea. Say explicitly why finishing C early does not help.'},
+  {q:'(b) · 9m', head:'Three recovery strategies', tree:[
+    ['<b>Crashing</b> — add developers or overtime to B and D',
+      ['Shortens duration, <span class="key">raises cost</span>','Watch Brooks’ Law — ramp-up time for new people']],
+    ['<b>Fast tracking</b> — overlap F with the tail of D and E',
+      ['No extra cost, <span class="key">raises rework risk</span>']],
+    ['<b>Resource reallocation + scope prioritisation</b>',
+      ['Move staff off the float-rich C–E path onto D','MoSCoW-defer non-essential features']]
+  ]},
+  {q:'(c) · 8m', head:'“Remove testing to recover time?”', tree:[
+    ['Verdict: <span class="key">reject it</span>',
+      ['Undetected defects and data-integrity failures in a scholarship system','Expensive post-release rework','Client distrust, possible contractual breach','Time saved returns as a larger delay']],
+    ['Better strategy',
+      ['Keep critical testing; add <span class="key">automated regression</span> to cut test time','Crash and fast-track the critical path','Reallocate from the float path','MoSCoW-descope non-essential features']]
+  ], trap:'Never answer yes. This question is testing whether you protect quality under schedule pressure.'}
+ ]
+},
+/* ============ AREA 4 ============ */
+{
+ area:4, code:'4 · SET 1', accent:C[3], marks:'≈8 + 8 + 9 = 25',
+ name:'Smart University Management System — cost aggregation',
+ scenario:'Five work packages. Finance wants a cost aggregation report; sponsor wants the total budget before approving.',
+ branches:[
+  {q:'(a)', head:'Cost aggregation', tree:[
+    ['Summing estimated costs progressively up the WBS to total project cost'],
+    ['Ladder: <span class="key">Activities → Work Packages → Control Accounts → Cost Baseline → Total Budget</span>'],
+    ['Produces the cost baseline, project budget, cost control reports'],
+    ['Example WP-1 (Student Admission)',
+      ['Requirements 5,000 · UI 8,000 · DB design 10,000 · Coding 15,000 · Testing 7,000 = <b>45,000</b>']]
+  ]},
+  {q:'(b)', head:'WBS and Control Accounts in bottom-up estimating', tree:[
+    ['<b>WBS</b> — breaks work into tasks, supports detailed estimation, prevents omissions, improves accuracy'],
+    ['<b>Control Account</b> — groups work packages for monitoring, supports budget control, detects variance, enables performance reporting'],
+    ['Example — control account “Academic Services”',
+      ['Admission 45,000 + Course Registration 60,000 = <b>105,000</b>','Monitored as one unit, not activity by activity']]
+  ]},
+  {q:'(c)', head:'The calculation', calc:
+`WP: 45,000 + 60,000 + 35,000 + 20,000 + 40,000
+(i)   Aggregated Work Package Cost          = $200,000
+(ii)  Contingency Reserve  10% × 200,000    = $ 20,000
+      COST BASELINE                          = $220,000
+(iii) Management Reserve   5% × 220,000     = $ 11,000
+      TOTAL PROJECT BUDGET                   = $231,000`,
+   tree:[
+    ['<b>(iv) Contingency vs Management Reserve</b>',
+      ['Contingency — <span class="key">known</span> risks · <span class="key">inside</span> the baseline · PM controls · planned during estimation','Management — <span class="key">unknown</span> risks · <span class="key">outside</span> the baseline · sponsor controls · released on unforeseen events','Contingency examples: minor requirement change, small test delay, extra debugging','Management examples: regulatory change, natural disaster, restructuring']]
+  ], trap:'Management reserve is 5% of the COST BASELINE, not of the work-package total. 5% × 200,000 = 10,000 is the wrong answer.'}
+ ]
+},
+{
+ area:4, code:'4 · SET 2', accent:C[3], marks:'7 + ≈10 + ≈8 = 25',
+ name:'AI Hospital Management System — labour-based costing',
+ scenario:'6 engineers × 110 days × 8 h, blended rate $30/h, non-labour $21,600, contingency 10%, management reserve 5%, sponsor funds $45,000/month over 5 months.',
+ branches:[
+  {q:'(a) · 7m', head:'Cost Management; Cost vs Price vs Budget', tree:[
+    ['<b>Cost Management</b> — planning, estimating, budgeting, financing, monitoring, controlling costs to finish within the approved budget'],
+    ['<b>Cost</b> — money spent to develop · company’s view · labour, hardware, cloud, testing, overhead'],
+    ['<b>Price</b> — amount charged to the client · <span class="key">Cost + Profit + Risk margin + Tax</span>'],
+    ['<b>Budget</b> — approved allocation · <span class="key">Cost Baseline + Management Reserve</span>'],
+    ['Why cost ≠ price',
+      ['Price must cover overhead, profit, business risk, tax','Also shaped by competition and willingness to pay','Example: cost $180,000, 20% margin → price $216,000']]
+  ]},
+  {q:'(b)', head:'The calculation', calc:
+`(i)   Labour hours   = 6 × 110 × 8            = 5,280 hours
+(ii)  Labour cost    = 5,280 × $30            = $158,400
+(iii) Total activity = 158,400 + 21,600       = $180,000
+      Contingency 10% × 180,000               = $ 18,000
+(iv)  COST BASELINE                            = $198,000
+      Management Reserve 5% × 198,000         = $  9,900
+(v)   TOTAL PROJECT BUDGET                     = $207,900`,
+   tree:[['Show every line — method marks are given even if a number slips']]},
+  {q:'(c)', head:'Funding check, baseline, reserve, S-curve', tree:[
+    ['<b>Funding</b> — $45,000 × 5 months = <span class="key">$225,000 &gt; $207,900 → sufficient</span>',
+      ['Headroom ≈ $17,100']],
+    ['<b>Cost Baseline purpose</b> — time-phased approved budget; the yardstick for measuring and controlling actual spend'],
+    ['<b>Management reserve excluded</b> — covers unknown risks outside approved scope; released only by senior management'],
+    ['<b>S-Curve</b>',
+      ['Cumulative planned vs actual expenditure over time','Flat–steep–flat shape','Reveals overspend or underspend early; supports forecasting and corrective action']]
+  ]}
+ ]
+},
+/* ============ AREA 5 ============ */
+{
+ area:5, code:'5 · SET 1', accent:C[4], marks:'10 + 8 + 7 = 25',
+ name:'18-person hierarchical team — patches pushed live, client lost trust',
+ scenario:'Devs patch the live system without updating the repo or telling QA. Juniors feel excluded and unfairly reviewed. The weekly client report is wordy, jargon-filled and defensive.',
+ branches:[
+  {q:'Q1(A) · 10m', head:'Manage vs Monitor Communications', tree:[
+    ['<b>Manage Communications</b> — create, collect, distribute, store, retrieve information',
+      ['Formal communication plan','All code committed to the central repository','<span class="key">QA approval mandatory before deployment</span>','Daily stand-ups between devs and QA','Weekly client progress reports','Jira issue tracking; formal change approval before release']],
+    ['<b>Monitor Communications</b> — check it is actually working',
+      ['Verify developers follow the process','Audit commits and deployment records','Confirm QA receives build notifications','Collect client feedback; measure effectiveness','Correct issues immediately']],
+    ['<b>Inputs</b> (any two) — Communications Management Plan, Project Management Plan, Project Communications, Stakeholder Engagement Plan'],
+    ['<b>Outputs</b> (any two) — Project Communications, <span class="key">Work Performance Information</span>, Change Requests, plan/document updates']
+  ]},
+  {q:'Q1(B) · 8m', head:'Why communication failed + factors broken', tree:[
+    ['<b>Size</b> — 18 people → <span class="key">n(n−1)/2 = 153 channels</span>',
+      ['Information lost; no single source of truth']],
+    ['<b>Structure</b> — strict top-down hierarchy',
+      ['Juniors hesitate to speak up; slow flow; centralised decisions']],
+    ['<b>Composition</b> — homogeneous, highly task-oriented',
+      ['No knowledge sharing; issues never discussed']],
+    ['Factor 1 broken — <span class="key">fairness and recognition</span>',
+      ['Seniors favoured in code reviews → unequal evaluation → low morale']],
+    ['Factor 2 broken — <span class="key">trust and inclusion</span>',
+      ['Juniors excluded from decisions → disengagement, poor collaboration']]
+  ], trap:'The 153-channel calculation is a free mark. Write the formula out.'},
+  {q:'Q1(C) · 7m', head:'Rewrite using the 5Cs', tree:[
+    ['<b>Clear</b> — jargon → plain business language'],
+    ['<b>Concise</b> — long report → progress, issues, next steps only'],
+    ['<b>Correct</b> — missing data → <span class="key">70% milestones complete, 65% budget used</span>'],
+    ['<b>Complete</b> — unexplained delay → reason + corrective action'],
+    ['<b>Courteous</b> — defensive tone → professional, reassuring'],
+    ['Then write the rewritten report itself',
+      ['Milestone % and budget %','Which module slipped and by how long','Recovery action; final date unaffected','Testing status, no critical defects','Weekly updates promised; close with thanks']]
+  ]}
+ ]
+},
+{
+ area:5, code:'5 · SET 2', accent:C[4], marks:'12 + 13 = 25',
+ name:'E-commerce site — reports missing or useless',
+ scenario:'Some stakeholders never receive the weekly report; others receive it but it lacks what they need.',
+ branches:[
+  {q:'Q2(A) · 12m', head:'Steps the PM takes', tree:[
+    ['1. Identify the problem — who receives nothing vs who receives the wrong content'],
+    ['2. Review the <span class="key">Communications Management Plan</span> — who, what, when, how, which channel'],
+    ['3. Identify all stakeholders; update the Stakeholder Register'],
+    ['4. Analyse information needs per stakeholder',
+      ['Client — milestones, budget, risks','Sponsor — cost and overall status','Developers — tasks and technical issues','QA — test schedule, defects, build status']],
+    ['5. Improve channels',
+      ['Email for weekly reports · dashboards (Jira/Azure DevOps)','Weekly status meetings · Slack/Teams for urgent · shared repository']],
+    ['6. Monitor effectiveness — confirm receipt, collect feedback, update the plan']
+  ]},
+  {q:'Q2(B) · 13m', head:'Communication problems + strategies', tree:[
+    ['Jargon with non-technical stakeholders → tailor language, business-level summaries'],
+    ['Information overload → role-based distribution, dashboards'],
+    ['Unclear responsibility → <span class="key">RACI matrix</span>, documented ownership'],
+    ['Distributed teams and time zones → overlap hours, written decision records'],
+    ['Hierarchical barriers → stand-ups, open-door culture, psychological safety'],
+    ['Conflicting stakeholder expectations → MoSCoW prioritisation, formal change control'],
+    ['Poor documentation / version confusion → single source of truth, configuration management'],
+    ['Team conflict → collaborate/problem-solve, pre-agreed decision rules']
+  ], trap:'Every problem needs an example AND a strategy. A bare list of problems scores about half.'}
+ ]
+},
+/* ============ AREA 6 ============ */
+{
+ area:6, code:'6 · Q1', accent:C[0], marks:'10 + 10 + 5 = 25',
+ name:'Mobile Healthcare Appointment System — SQA',
+ scenario:'Frequent crashes, inconsistent code across developers, security vulnerabilities, bugs after every update, incomplete documentation.',
+ branches:[
+  {q:'(a) · 10m', head:'How SQA helps + five elements', tree:[
+    ['<b>SQA</b> — planned, systematic activities ensuring processes and products comply with requirements and standards',
+      ['Focus on <span class="key">preventing</span> defects, not only detecting them']],
+    ['1. <b>Reviews and audits</b> — catch inconsistent code and design defects before deployment'],
+    ['2. <b>Software testing</b> — unit, integration, system, <span class="key">regression</span>, UAT',
+      ['Regression testing stops updates reintroducing bugs']],
+    ['3. <b>Configuration management</b> — Git keeps a consistent codebase, prevents version conflicts'],
+    ['4. <b>Documentation control</b> — SRS, design documents, user manuals kept current'],
+    ['5. <b>Standards and procedures</b> — one coding standard → readable, maintainable code']
+  ]},
+  {q:'(b) · 10m', head:'Five practical actions, each justified', tree:[
+    ['<b>Mandatory code review</b> before merge → early error detection, consistency, knowledge sharing'],
+    ['<b>Automated testing + CI/CD</b> → bugs caught on every change, fewer deployment failures'],
+    ['<b>Secure coding + security testing</b> → fewer vulnerabilities, patient data protected, compliance'],
+    ['<b>Standardised coding guidelines</b> → consistent maintainable code, easier debugging'],
+    ['<b>Improved documentation</b> across the lifecycle → onboarding, maintenance, fewer misunderstandings']
+  ], trap:'Each action needs a Recommendation line and a Justification line. Recommendations alone lose half.'},
+  {q:'(c) · 5m', head:'Standards and benchmarking', tree:[
+    ['<b>Standards</b> — documented guidelines for consistent, secure, reliable development',
+      ['ISO 9001, ISO/IEC 25010, IEEE 730, CMMI','Scenario: coding standards fix the inconsistent code','Testing standards force regression testing before release']],
+    ['<b>Benchmarking</b> — comparing performance and quality against targets or industry practice',
+      ['Crash rate before vs after SQA','Vulnerability count vs industry benchmarks','Post-release defect reduction after automated regression','Documentation completeness vs organisational standards']]
+  ]}
+ ]
+},
+{
+ area:6, code:'6 · Q2', accent:C[0], marks:'7 + 10 + 8 = 25',
+ name:'HMIS — Plan Quality Management',
+ scenario:'Patient registration, EMR, billing, lab reports, scheduling. Strict security, reliability, performance, usability, accuracy. Past projects had defects, incomplete requirements, no coding standards, inconsistent testing, poor dev–tester communication.',
+ branches:[
+  {q:'(a) · 7m', head:'Purpose and key inputs', tree:[
+    ['<b>Plan Quality Management</b> — identify quality requirements and standards, and document how compliance will be demonstrated'],
+    ['Purpose',
+      ['Define quality standards — coding, testing, security, documentation','Identify quality requirements from the client','<span class="key">Prevent defects</span> rather than fix them later','Standardise processes across developers and testers','Support continuous improvement']],
+    ['Inputs',
+      ['Project Charter · Project Management Plan','Requirements documentation · <span class="key">Risk Register</span>','Stakeholder Register · EEF and OPA · Assumption log']]
+  ]},
+  {q:'(b) · 10m', head:'Four tools and techniques with scenario examples', tree:[
+    ['<b>Cost-Benefit Analysis / Cost of Quality</b> — weigh prevention against failure cost'],
+    ['<b>Document Analysis</b> — review the SRS, find incomplete lab-report approval requirements'],
+    ['<b>Process Analysis / Root Cause Analysis</b>',
+      ['Poor dev–tester communication → introduce reviews and daily stand-ups','Billing errors traced to wrong DB validation rules → fix the cause, defects stop']],
+    ['<b>MCDA</b> — score cloud providers on security, availability, scalability, cost, support'],
+    ['<b>Data representation</b>',
+      ['Affinity diagram — group feedback into security, performance, usability, functional','Fishbone — crashes traced to people, process, hardware, software, DB, network','Flowchart — map patient registration, remove delays']]
+  ]},
+  {q:'(c) · 8m', head:'Quality management tools', tree:[
+    ['<span class="key">The seven basic tools</span>',
+      ['1. Cause-and-Effect (Fishbone / Ishikawa)','2. Flowchart','3. Check sheet','4. Pareto chart (80/20)','5. Histogram','6. Control chart','7. Scatter diagram']],
+    ['<b>Cost of Quality</b>',
+      ['Conformance = prevention + appraisal','Non-conformance = internal failure + <span class="key">external failure</span> (most expensive)','Prevention always pays']]
+  ]}
+ ]
+},
+/* ============ AREA 7 ============ */
+{
+ area:7, code:'7 · SET 1', accent:C[1], marks:'5 + 10 + 10 = 25',
+ name:'MediTrack — resource processes and estimating',
+ scenario:'Flutter app collecting patient sensor data with AI anomaly detection, 3-month delivery. A similar sensor app exists; a company formula estimates cost per screen. Team size still undecided.',
+ branches:[
+  {q:'Q1 · 5m', head:'Six Resource Management processes in order', tree:[
+    ['1. <b>Plan Resource Management</b> — how resources will be estimated, acquired, managed, controlled'],
+    ['2. <b>Estimate Activity Resources</b> — type and quantity per activity'],
+    ['3. <b>Acquire Resources</b> — obtain people, equipment, materials'],
+    ['4. <b>Develop Team</b> — build skills, knowledge, collaboration'],
+    ['5. <b>Manage Team</b> — performance, conflict, feedback'],
+    ['6. <b>Control Resources</b> — monitor physical resource usage']
+  ]},
+  {q:'Q2 · 10m', head:'Estimating techniques', tree:[
+    ['(a) In the scenario',
+      ['Similar past sensor app → <span class="key">Analogous Estimating</span>','Cost-per-screen formula → <span class="key">Parametric Estimating</span>']],
+    ['(b) One-line definitions',
+      ['Analogous — historical data from one similar completed project','Parametric — statistical relationship, e.g. <span class="mono">18 screens × $3,000 = $54,000</span>']],
+    ['Comparison',
+      ['Analogous: accuracy low (−25% to +75%), effort very low, used early','Parametric: accuracy moderate–high if data is reliable, effort low']],
+    ['(c) More accurate but more effort → <span class="key">Bottom-Up</span>',
+      ['Estimates every activity and aggregates','Needs a detailed WBS; days–weeks vs hours']]
+  ]},
+  {q:'Q3 · 10m', head:'Resource planning and the RBS', tree:[
+    ['(a) Process = <span class="key">Estimate Activity Resources</span>',
+      ['Sits between Plan Resource Management (how) and Acquire Resources (getting)','Planning is underway but numbers undecided → this is the missing step']],
+    ['(b) Output = <span class="key">Resource Requirements</span>',
+      ['Also RBS, Basis of Estimates, project document updates']],
+    ['(c) RBS for MediTrack',
+      ['Human — PM, Flutter devs, backend devs, ML engineer, UI/UX, QA, DevOps','Equipment — laptops, test devices, sensor hardware','Software — Flutter SDK, IDEs, ML frameworks, test tools, CI/CD','Facilities/Services — cloud hosting, storage, project room']]
+  ]}
+ ]
+},
+{
+ area:7, code:'7 · SET B', accent:C[1], marks:'5 + 10 + 10 = 25',
+ name:'AgriSense — team development',
+ scenario:'Six-member team joined two weeks ago. Polite in meetings, no technical disagreement yet, architecture undecided, everyone waiting for someone else to lead.',
+ branches:[
+  {q:'Q1 · 5m', head:'Tuckman Ladder', tree:[
+    ['<b>Forming</b> — meet, understand goals, depend on the leader, avoid conflict'],
+    ['<b>Storming</b> — opinions clash, conflict arises, roles emerge'],
+    ['<b>Norming</b> — conflict resolved, trust and ground rules, collaboration'],
+    ['<b>Performing</b> — efficient, self-organising, minimal supervision'],
+    ['<b>Adjourning</b> — work complete, team released, lessons learned'],
+    ['Mnemonic <span class="mono">F – S – N – P – A</span>']
+  ]},
+  {q:'Q2 · 10m', head:'Current stage and what comes next', tree:[
+    ['(a) Stage = <span class="key">Forming</span>',
+      ['Joined two weeks ago; polite; no disagreement; waiting for a leader','The decisive point: architecture is genuinely contestable yet nobody objects','<span class="key">Silence before conflict is Forming; harmony after conflict is Norming</span>','Psychological safety to challenge each other has not been built']],
+    ['(b) Next = <span class="key">Storming</span>',
+      ['Opinions surface; roles clarify; leadership challenged','AgriSense: MVC vs MVVM, Firebase vs PostgreSQL, API design','Normal and necessary — not a failure']],
+    ['PM manages the transition',
+      ['Actively invite dissent — structured architecture workshop','Keep conflict task-focused, never personal','Set decision rules in advance so debate converges','Prefer <span class="key">collaborate/problem-solve</span>; avoid withdrawal']]
+  ], trap:'Do not answer Norming. Apparent agreement here is untested, not earned.'},
+  {q:'Q3 · 10m', head:'Develop Team tools', tree:[
+    ['(a) Two tools now — <span class="key">Colocation</span> and <span class="key">Recognition and Rewards</span>',
+      ['Others: training, team-building, ground rules, communication technology, assessments']],
+    ['(b) <b>Colocation</b> — placing the team physically in one location',
+      ['Faster communication and decisions','AgriSense: devs, designer and testers in one room during architecture']],
+    ['(c) <b>Recognition and Rewards</b> — formal and informal acknowledgement of good performance',
+      ['Grounded in Herzberg motivators and expectancy theory','Need not be financial — public praise, sponsor visibility, interesting work, autonomy','<span class="key">Careful: must be fair, transparent, measurable</span>','Favouritism or rewarding only seniors destroys morale']]
+  ]}
+ ]
+},
+/* ============ AREA 8 ============ */
+{
+ area:8, code:'8 · Q1', accent:C[4], marks:'10 + 10 + 10 = 30',
+ name:'National Smart Healthcare System — risk',
+ scenario:'12 months, Tk 20 crore. Two senior engineers resign; Ministry requests extra AI features; cloud prices rise; security vulnerabilities found; remote hospitals have unstable internet.',
+ branches:[
+  {q:'(a) · 10m', head:'Four risks — why, class, justification', tree:[
+    ['Engineers resign — knowledge loss, delay, lower productivity → <span class="key">Project</span>',
+      ['Affects resource availability, schedule, team performance']],
+    ['Extra AI features — more scope, effort, cost, time → <span class="key">Project</span>',
+      ['A scope change leading to creep and delay']],
+    ['Cloud price rise — infrastructure exceeds the budget → <span class="key">Business</span>',
+      ['Directly affects project finances and contract cost']],
+    ['Security vulnerabilities — data exposure, legal and reputational damage → <span class="key">Technical</span>',
+      ['Relates to security, reliability, technical quality']],
+    ['Also acceptable — unstable rural internet → Technical (availability, performance, access)']
+  ]},
+  {q:'(b) · 10m', head:'Response strategies', tree:[
+    ['Engineers resign → <b>Mitigate</b>',
+      ['Cross-training, documentation, backup or recruited developers']],
+    ['Extra AI features → <b>Avoid</b> via formal change control',
+      ['No implementation without approval and impact analysis']],
+    ['Cloud price rise → <b>Transfer</b>',
+      ['Fixed-price contract or alternative provider']],
+    ['Security vulnerabilities → <b>Mitigate</b>',
+      ['Penetration testing, code review, encryption, vulnerability assessment']],
+    ['Definitions to state',
+      ['<span class="key">Avoid</span> eliminates the cause · <span class="key">Mitigate</span> reduces probability or impact','<span class="key">Transfer</span> shifts responsibility · <span class="key">Accept</span> acknowledges + holds contingency']]
+  ]},
+  {q:'(c) · 10m', head:'Presenting the Risk Management Plan', tree:[
+    ['1. <b>Monitor risks</b>',
+      ['Weekly risk reviews; track triggers and early warnings','Reassess probability and impact; update mitigation','Report major risks to the Ministry']],
+    ['2. <b>Risk Register</b>',
+      ['ID, description, category, probability, impact, priority','Response, <span class="key">owner</span>, status','Updated when risks are added, change status, are re-planned or closed']],
+    ['3. <b>Risk owners</b>',
+      ['Resignation → PM · Security → Security Lead','AI scope → BA/PM · Cloud cost → Procurement · Connectivity → Network Engineer']],
+    ['4. <b>Stay on schedule and budget</b>',
+      ['Prioritise by register; apply responses promptly','Enforce change control; hold contingency reserves','Track with <span class="key">EVM</span>; monitor the critical path','Fast track or crash if needed; track spend vs Cost Baseline']]
+  ]}
+ ]
+},
+{
+ area:8, code:'8 · Q2', accent:C[4], marks:'10 + 10 + 10 = 30',
+ name:'Smart Railway Ticketing — risk with a fixed Eid launch',
+ scenario:'10 months. Eid traffic 5×; Railway wants a new mobile payment platform; gateway outages; payment-module vulnerabilities; monsoon flooding; budget nearly exhausted.',
+ branches:[
+  {q:'(a) · 10m', head:'Four critical risks — why, class, justification', tree:[
+    ['5× Eid traffic — overload, slow response, outage at peak → <span class="key">Technical</span>',
+      ['Performance, scalability, availability']],
+    ['New mobile payment integration — outside original scope, adds time and cost → <span class="key">Project</span>'],
+    ['Payment-module security flaws — financial and personal data exposure → <span class="key">Technical</span>',
+      ['Security, reliability, compliance']],
+    ['Budget nearly exhausted — may prevent completing the work → <span class="key">Business</span>',
+      ['Financing, contractual obligation, viability']],
+    ['Also acceptable — gateway outages (Technical), monsoon flooding (Business/external)']
+  ]},
+  {q:'(b) · 10m', head:'Response strategy per risk, with justification', tree:[
+    ['Eid traffic → <b>Mitigate</b>',
+      ['Demand cannot be avoided, so reduce impact','Load testing, cloud auto-scaling, DB optimisation, load balancers']],
+    ['Payment integration → <b>Avoid</b> via change control',
+      ['Building it now threatens the fixed date; defer if non-essential']],
+    ['Security flaws → <b>Mitigate</b>',
+      ['Cannot be transferred or accepted given payment sensitivity','Penetration testing, code review, scanning, encryption, audits']],
+    ['Budget exhausted → <b>Accept with contingency planning</b>',
+      ['The shortfall has already occurred','Control remaining spend, prioritise essentials, draw reserves']]
+  ], trap:'Justify why the chosen strategy beats the alternatives. That comparison is where the marks sit.'},
+  {q:'(c) · 10m', head:'Plan with the launch date fixed', tree:[
+    ['1. <b>Prioritise</b> with a Probability–Impact Matrix',
+      ['High: security, server performance, budget exhaustion','Medium: payment integration — manageable by change control']],
+    ['2. <b>Risk owners</b>',
+      ['Server performance → Technical Lead / DevOps','Security → Cybersecurity Lead','Integration → PM and BA · Budget → PM / Finance Manager']],
+    ['3. <b>Risk Register</b> — reviewed and updated throughout'],
+    ['4. <b>Monitor until deployment</b>',
+      ['Weekly reviews; continuous tracking of high-priority risks','Load and stress testing before Eid; regular security assessments','Report to Bangladesh Railway and sponsors']],
+    ['5. <b>Balance scope, cost, schedule</b>',
+      ['Date is fixed → <span class="key">scope and cost must flex</span>','Must-Haves only: booking, digital payment, NID verification, live updates','Defer enhancements post-Eid; track vs Cost Baseline','Crash or fast-track critical-path work only; hold reserves']]
+  ], trap:'With a fixed date, never propose extending the deadline. Flex scope instead.'}
+ ]
+}
+];
+
+/* ---------- render ---------- */
+function renderTree(items){
+  let html = '<ul class="tree">';
+  for (const it of items){
+    const label = it[0];
+    const kids  = it[1];
+    html += '<li><span class="node">' + label + '</span>';
+    if (kids && kids.length){
+      html += '<ul>' + kids.map(k => '<li>' + k + '</li>').join('') + '</ul>';
+    }
+    html += '</li>';
+  }
+  return html + '</ul>';
+}
+
+function renderSet(s){
+  let b = '';
+  for (const br of s.branches){
+    b += '<div class="branch">';
+    b += '<div class="bhead"><span class="q">' + br.q + '</span><span>' + br.head + '</span></div>';
+    if (br.calc) b += '<div class="calc">' + br.calc + '</div>';
+    if (br.tree) b += renderTree(br.tree);
+    if (br.trap) b += '<span class="trap"><b>Trap</b> — ' + br.trap + '</span>';
+    b += '</div>';
+  }
+  return '<article class="sheet" data-area="' + s.area + '" style="--accent:' + s.accent + '">'
+    + '<div class="titleblock">'
+      + '<span class="code">' + s.code + '</span>'
+      + '<h2 class="setname">' + s.name + '</h2>'
+      + '<span class="marks">' + s.marks + '</span>'
+    + '</div>'
+    + '<p class="scenario">' + s.scenario + '</p>'
+    + '<div class="body">' + b + '</div>'
+    + '</article>';
+}
+
+const mount = document.getElementById('sheets');
+mount.innerHTML = SETS.map(renderSet).join('');
+
+const countEl = document.getElementById('count');
+function applyFilter(area){
+  let shown = 0;
+  document.querySelectorAll('.sheet').forEach(el => {
+    const match = (area === 'all' || el.dataset.area === area);
+    el.style.display = match ? '' : 'none';
+    if (match) shown++;
+  });
+  countEl.textContent = shown + (shown === 1 ? ' set' : ' sets') + ' shown';
+}
+
+document.getElementById('chips').addEventListener('click', e => {
+  const btn = e.target.closest('.chip');
+  if (!btn) return;
+  document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', String(c === btn)));
+  applyFilter(btn.dataset.area);
+  window.scrollTo({top: 0, behavior: 'smooth'});
+});
+
+applyFilter('all');
+</script>
+</body>
+</html>
